@@ -8,6 +8,9 @@
 //  https://github.com/0xWDG/SwiftCronParser
 //  MIT License
 //
+
+#if canImport(Testing)
+
 import Testing
 @testable import SwiftCronParser
 
@@ -87,3 +90,5 @@ import Testing
         0, 1, 2, 3, 4, 5, 6
     ], "testSpecialCronString: not every day of week")
 }
+
+#endif
