@@ -465,7 +465,7 @@ public class SwiftCronParser {
         public var dayOfWeek: [Int] = []
 
         /// Day of week with day names
-        public var dayOfWeeks: [String] {
+        public var daysOfWeek: [String] {
             var dayOfWeeksString: [String] = []
 
             for dayOfWeek in self.dayOfWeek {
