@@ -125,6 +125,7 @@ public class SwiftCronParser {
     /// Parse special (non-standard) cron expressions
     /// - Returns: The cron time
     private func parseSpecialCron() -> CronTime {
+        // swiftlint:disable:previous function_body_length
         switch cronInput.uppercased().components(separatedBy: " ").first {
         case "@YEARLY", "@annually":
             return .init(
