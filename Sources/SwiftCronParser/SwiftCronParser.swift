@@ -17,7 +17,7 @@ import Foundation
 ///
 /// Example:
 /// ```
-/// let cronParser = SwiftCronParser(cronInput: "0 0 * * *")
+/// let cronParser = SwiftCronParser(input: "0 0 * * *")
 /// let cronTime = cronParser.parse()
 ///
 /// if let error = cronTime.error {
@@ -27,7 +27,7 @@ import Foundation
 ///     print("Minute: \(cronTime.minute)")
 ///     print("Day: \(cronTime.day)")
 ///     print("Month: \(cronTime.month)")
-///     print("WeekDay: \(cronTime.weekDay)")
+///     print("dayOfWeek: \(cronTime.dayOfWeek)")
 /// }
 /// ```
 public class SwiftCronParser {
@@ -35,10 +35,28 @@ public class SwiftCronParser {
     private var cronInput: String
     private var cronComponents: [String]
 
-    /// Initialize the parser
+    /// SwiftCronParser
     ///
-    /// - Parameter cronInput: The cron input
-    public init(cronInput: String) {
+    /// A simple Swift Cron Parser
+    ///
+    /// - Parameter input: The cron input
+    ///
+    /// Example:
+    /// ```
+    /// let cronParser = SwiftCronParser(input: "0 0 * * *")
+    /// let cronTime = cronParser.parse()
+    ///
+    /// if let error = cronTime.error {
+    ///     print("Error: \(error)")
+    /// } else {
+    ///     print("Hour: \(cronTime.hour)")
+    ///     print("Minute: \(cronTime.minute)")
+    ///     print("Day: \(cronTime.day)")
+    ///     print("Month: \(cronTime.month)")
+    ///     print("dayOfWeek: \(cronTime.dayOfWeek)")
+    /// }
+    /// ```
+    public init(input cronInput: String) {
         self.cronInput = cronInput
         self.cronComponents = cronInput.components(separatedBy: " ")
     }
@@ -56,11 +74,11 @@ public class SwiftCronParser {
 
         var cronTime: CronTime = .init()
 
-        cronTime.add(calculateHour(cronComponents[0]))
-        cronTime.add(calculateMinute(cronComponents[1]))
+        cronTime.add(calculateMinute(cronComponents[0]))
+        cronTime.add(calculateHour(cronComponents[1]))
         cronTime.add(calculateDay(cronComponents[2]))
         cronTime.add(calculateMonth(cronComponents[3]))
-        cronTime.add(calculateWeekDay(cronComponents[4]))
+        cronTime.add(calculatedayOfWeek(cronComponents[4]))
 
         return cronTime
     }
@@ -109,15 +127,61 @@ public class SwiftCronParser {
     private func parseSpecialCron() -> CronTime {
         switch cronInput.uppercased().components(separatedBy: " ").first {
         case "@YEARLY", "@annually":
-            return .init(hour: [0], minute: [0], day: [1], month: [1])
+            return .init(
+                hour: [0],
+                minute: [0],
+                day: [1],
+                month: [1],
+                dayOfWeek: [0, 1, 2, 3, 4, 5, 6]
+            )
         case "@MONTHLY":
-            return .init(hour: [0], minute: [0], day: [1])
+            return .init(
+                hour: [0],
+                minute: [0],
+                day: [1],
+                month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                dayOfWeek: [0, 1, 2, 3, 4, 5, 6]
+            )
         case "@WEEKLY":
-            return .init(hour: [0], minute: [0], weekDay: [0])
+            return .init(
+                hour: [0],
+                minute: [0],
+                day: [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+                ],
+                month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                dayOfWeek: [0]
+            )
         case "@DAILY", "@MIDNIGHT":
-            return .init(hour: [0], minute: [0])
+            return .init(
+                hour: [0],
+                minute: [0],
+                day: [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+                ],
+                month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                dayOfWeek: [0, 1, 2, 3, 4, 5, 6]
+            )
         case "@HOURLY":
-            return .init(hour: [0])
+            return .init(
+                hour: [
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23
+                ],
+                minute: [0],
+                day: [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+                ],
+                month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                dayOfWeek: [0, 1, 2, 3, 4, 5, 6]
+            )
         case "@REBOOT":
             return .init(special: ["at reboot"])
         default:
@@ -149,12 +213,13 @@ public class SwiftCronParser {
             return .init(hour: parseStep(hour, max: 23))
         }
 
+        // Parse hour
         if hour == "*" {
-            return .init(minute: Array(0...23))
+            return .init(hour: Array(0...23))
         }
 
         guard let hourInt = Int(hour) else {
-            return .init(widthError: "calculateHour invalid: \(hour)")
+            return .init(withError: "calculateHour invalid: \(hour)")
         }
 
         return .init(hour: [hourInt])
@@ -167,8 +232,8 @@ public class SwiftCronParser {
         if minute.contains(",") {
             var crontime: CronTime = .init()
 
-            for parseHour in minute.split(separator: ",") {
-                crontime.add(calculateMinute(String(parseHour)))
+            for parseMinute in minute.split(separator: ",") {
+                crontime.add(calculateMinute(String(parseMinute)))
             }
 
             return crontime
@@ -181,7 +246,7 @@ public class SwiftCronParser {
 
         // Parse the step modifier
         if minute.contains("/") {
-            return .init(hour: parseStep(minute, max: 59))
+            return .init(minute: parseStep(minute, max: 59))
         }
 
         if minute == "*" {
@@ -189,7 +254,7 @@ public class SwiftCronParser {
         }
 
         guard let minuteInt = Int(minute) else {
-            return .init(widthError: "calculateMinute invalid: \(minute)")
+            return .init(withError: "calculateMinute invalid: \(minute)")
         }
 
         return .init(minute: [minuteInt])
@@ -302,13 +367,13 @@ public class SwiftCronParser {
     /// Calculate the week day from the cron input
     /// - Parameter day: The week day string
     /// - Returns: The cron time
-    private func calculateWeekDay(_ day: String) -> CronTime {
+    private func calculatedayOfWeek(_ day: String) -> CronTime {
         // swiftlint:disable:previous cyclomatic_complexity
         if day.contains(",") {
             var crontime: CronTime = .init()
 
             for parseDay in day.split(separator: ",") {
-                crontime.add(calculateWeekDay(String(parseDay)))
+                crontime.add(calculatedayOfWeek(String(parseDay)))
             }
 
             return crontime
@@ -316,31 +381,31 @@ public class SwiftCronParser {
 
         // Parse the range modifier
         if day.contains("-") {
-            return .init(weekDay: parseRange(day))
+            return .init(dayOfWeek: parseRange(day))
         }
 
         // Parse the step modifier
         if day.contains("/") {
-            return .init(weekDay: parseStep(day, max: 6))
+            return .init(dayOfWeek: parseStep(day, max: 6))
         }
 
         switch day.uppercased() {
         case "0", "7", "SUN":
-            return .init(weekDay: [0])
+            return .init(dayOfWeek: [0])
         case "1", "MON":
-            return .init(weekDay: [1])
+            return .init(dayOfWeek: [1])
         case "2", "TUE":
-            return .init(weekDay: [2])
+            return .init(dayOfWeek: [2])
         case "3", "WED":
-            return .init(weekDay: [3])
+            return .init(dayOfWeek: [3])
         case "4", "THU":
-            return .init(weekDay: [4])
+            return .init(dayOfWeek: [4])
         case "5", "FRI":
-            return .init(weekDay: [5])
+            return .init(dayOfWeek: [5])
         case "6", "SAT":
-            return .init(weekDay: [6])
+            return .init(dayOfWeek: [6])
         case "*":
-            return .init(weekDay: [0, 1, 2, 3, 4, 5, 6])
+            return .init(dayOfWeek: [0, 1, 2, 3, 4, 5, 6])
         default:
             return .init()
         }
@@ -392,32 +457,32 @@ public class SwiftCronParser {
         }
 
         // MARK: Week days
-        public var weekDay: [Int] = []
-        public var weekDays: [String] {
-            var weekDaysString: [String] = []
+        public var dayOfWeek: [Int] = []
+        public var dayOfWeeks: [String] {
+            var dayOfWeeksString: [String] = []
 
-            for weekDay in self.weekDay {
-                switch weekDay {
+            for dayOfWeek in self.dayOfWeek {
+                switch dayOfWeek {
                 case 0, 7:
-                    weekDaysString.append("Sunday")
+                    dayOfWeeksString.append("Sunday")
                 case 1:
-                    weekDaysString.append("Monday")
+                    dayOfWeeksString.append("Monday")
                 case 2:
-                    weekDaysString.append("Tuesday")
+                    dayOfWeeksString.append("Tuesday")
                 case 3:
-                    weekDaysString.append("Wednesday")
+                    dayOfWeeksString.append("Wednesday")
                 case 4:
-                    weekDaysString.append("Thursday")
+                    dayOfWeeksString.append("Thursday")
                 case 5:
-                    weekDaysString.append("Friday")
+                    dayOfWeeksString.append("Friday")
                 case 6:
-                    weekDaysString.append("Saturday")
+                    dayOfWeeksString.append("Saturday")
                 default:
                     print("")
                 }
             }
 
-            return weekDaysString
+            return dayOfWeeksString
         }
 
         // MARK: Special
@@ -443,12 +508,12 @@ public class SwiftCronParser {
         }
 
         /// Check if the cronTime is valid
-        var isValid: Bool {
-            !hour.isEmpty && !minute.isEmpty && !day.isEmpty && !month.isEmpty && !weekDay.isEmpty
+        public var isValid: Bool {
+            !hour.isEmpty && !minute.isEmpty && !day.isEmpty && !month.isEmpty && !dayOfWeek.isEmpty
         }
 
         /// Debug description of the cronTime
-        var debugDescription: String {
+        public var debugDescription: String {
             let hour = !self.hour.isEmpty
             ? self.hour.map { String($0) }.joined(separator: ",")
             : "*"
@@ -464,11 +529,11 @@ public class SwiftCronParser {
             let month = !self.month.isEmpty
             ? self.month.map { String($0) }.joined(separator: ",")
             : "*"
-            let weekDay = !self.weekDay.isEmpty
-            ? self.weekDay.map { String($0) }.joined(separator: ",")
+            let dayOfWeek = !self.dayOfWeek.isEmpty
+            ? self.dayOfWeek.map { String($0) }.joined(separator: ",")
             : "*"
 
-            return "\(hour) \(minute) \(day) \(month) \(weekDay)"
+            return "\(hour) \(minute) \(day) \(month) \(dayOfWeek)"
         }
 
         /// Add a cronTime to the current cronTime
@@ -480,7 +545,7 @@ public class SwiftCronParser {
             self.minute.append(contentsOf: cronTime.minute)
             self.day.append(contentsOf: cronTime.day)
             self.month.append(contentsOf: cronTime.month)
-            self.weekDay.append(contentsOf: cronTime.weekDay)
+            self.dayOfWeek.append(contentsOf: cronTime.dayOfWeek)
 
             if cronTime.containsNonStandard {
                 self.containsNonStandard = true
@@ -496,7 +561,33 @@ public class SwiftCronParser {
             self.minute = Array(Set(self.minute)).sorted()
             self.day = Array(Set(self.day)).sorted()
             self.month = Array(Set(self.month)).sorted()
-            self.weekDay = Array(Set(self.weekDay)).sorted()
+            self.dayOfWeek = Array(Set(self.dayOfWeek)).sorted()
+        }
+
+        /// Initialize the cronTime
+        /// - Parameter hour: The hour
+        /// - Parameter minute: The minute
+        /// - Parameter day: The day
+        /// - Parameter month: The month
+        /// - Parameter dayOfWeek: The week day
+        /// - Parameter special: Indicate if the cron contains non-standard values
+        /// - Parameter withError: The error message (if any)
+        public init(
+            hour: [Int] = [],
+            minute: [Int] = [],
+            day: [Int] = [],
+            month: [Int] = [],
+            dayOfWeek: [Int] = [],
+            special: [String] = [],
+            withError: String? = nil
+        ) {
+            self.hour = hour
+            self.minute = minute
+            self.day = day
+            self.month = month
+            self.dayOfWeek = dayOfWeek
+            self.special = special
+            self.withError = withError
         }
     }
 }
