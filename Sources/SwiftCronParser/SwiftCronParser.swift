@@ -17,13 +17,16 @@ import Foundation
 ///
 /// Example:
 /// ```
+/// import SwiftCronParser
+/// 
 /// let cronParser = SwiftCronParser(input: "0 0 * * *")
 /// let cronTime = cronParser.parse()
-///
+/// 
 /// if let error = cronTime.error {
 ///     print("Error: \(error)")
 /// } else {
-///     print("Cron string: \(cronTime)")
+///     print("Cron string: \(cronTime)") // 0 0 0,1,2,3,4,5,6 1,2,3,4,5,6,7,8,9,10,11,12 0,1,2,3,4,5,6
+///     // Or using cronTime.minute, cronTime.hour, cronTime.dayOfMonth, cronTime.month, cronTime.dayOfWeek
 /// }
 /// ```
 public class SwiftCronParser {
@@ -39,13 +42,16 @@ public class SwiftCronParser {
     ///
     /// Example:
     /// ```
+    /// import SwiftCronParser
+    /// 
     /// let cronParser = SwiftCronParser(input: "0 0 * * *")
     /// let cronTime = cronParser.parse()
-    ///
+    /// 
     /// if let error = cronTime.error {
     ///     print("Error: \(error)")
     /// } else {
-    ///     print("Cron string: \(cronTime)")
+    ///     print("Cron string: \(cronTime)") // 0 0 0,1,2,3,4,5,6 1,2,3,4,5,6,7,8,9,10,11,12 0,1,2,3,4,5,6
+    ///     // Or using cronTime.minute, cronTime.hour, cronTime.dayOfMonth, cronTime.month, cronTime.dayOfWeek
     /// }
     /// ```
     public init(input cronInput: String) {
