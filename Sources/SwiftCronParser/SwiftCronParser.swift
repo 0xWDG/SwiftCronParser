@@ -413,13 +413,19 @@ public class SwiftCronParser {
     }
 
     public struct CronTime: CustomDebugStringConvertible {
+        /// Hour
         public var hour: [Int] = []
+
+        /// Minute
         public var minute: [Int] = []
-        // MARK: Day
+
+        /// Day
         public var day: [Int] = []
 
-        // MARK: Month
+        /// Month
         public var month: [Int] = []
+
+        /// Month names
         public var months: [String] {
             var monthsString: [String] = []
 
@@ -457,8 +463,10 @@ public class SwiftCronParser {
             return monthsString
         }
 
-        // MARK: Week days
+        /// Day of week
         public var dayOfWeek: [Int] = []
+
+        /// Day of week with day names
         public var dayOfWeeks: [String] {
             var dayOfWeeksString: [String] = []
 
@@ -486,13 +494,13 @@ public class SwiftCronParser {
             return dayOfWeeksString
         }
 
-        // MARK: Special
+        /// Save the special cron expressions
         public var special: [String] = []
 
-        // MARK: Contains non-standard
+        /// Indicate if the cron contains non-standard values
         public var containsNonStandard: Bool = false
 
-        // MARK: Error
+        /// Error message (if any) (private)
         private var withError: String?
 
         /// Error message (if any)
@@ -566,6 +574,7 @@ public class SwiftCronParser {
         }
 
         /// Initialize the cronTime
+        ///
         /// - Parameter hour: The hour
         /// - Parameter minute: The minute
         /// - Parameter day: The day
