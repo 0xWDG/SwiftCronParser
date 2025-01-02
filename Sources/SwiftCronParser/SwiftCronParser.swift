@@ -23,11 +23,7 @@ import Foundation
 /// if let error = cronTime.error {
 ///     print("Error: \(error)")
 /// } else {
-///     print("Hour: \(cronTime.hour)")
-///     print("Minute: \(cronTime.minute)")
-///     print("Day: \(cronTime.day)")
-///     print("Month: \(cronTime.month)")
-///     print("dayOfWeek: \(cronTime.dayOfWeek)")
+///     print("Cron string: \(cronTime)")
 /// }
 /// ```
 public class SwiftCronParser {
@@ -49,11 +45,7 @@ public class SwiftCronParser {
     /// if let error = cronTime.error {
     ///     print("Error: \(error)")
     /// } else {
-    ///     print("Hour: \(cronTime.hour)")
-    ///     print("Minute: \(cronTime.minute)")
-    ///     print("Day: \(cronTime.day)")
-    ///     print("Month: \(cronTime.month)")
-    ///     print("dayOfWeek: \(cronTime.dayOfWeek)")
+    ///     print("Cron string: \(cronTime)")
     /// }
     /// ```
     public init(input cronInput: String) {
