@@ -37,13 +37,13 @@ targets: [
 import SwiftUI
 import SwiftCronParser
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            /// ...
-        }
-        .padding()
-    }
+let cronParser = SwiftCronParser(input: "0 0 * * *")
+let cronTime = cronParser.parse()
+
+if let error = cronTime.error {
+    print("Error: \(error)")
+} else {
+    print("Cron string: \(cronTime)")
 }
 ```
 
