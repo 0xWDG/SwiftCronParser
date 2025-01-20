@@ -48,6 +48,10 @@ if let error = cronTime.error {
 }
 ```
 
+## Blogpos
+
+This [Blog post](http://wesleydegroot.nl/blog/Building-iWebTools#:~:text=Tool:%20crontab%20converter) explains how I used this library in my app [iWebTools](https://wesleydegroot.nl/apps/iWebTools).
+
 ## Contact
 
 🦋 [@0xWDG](https://bsky.app/profile/0xWDG.bsky.social)
